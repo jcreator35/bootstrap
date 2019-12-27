@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { jQuery as $ } from '../util/index'
+import { getjQuery } from '../util/index'
 import { createCustomEvent, defaultPreventedPreservedOnDispatch } from './polyfill'
 
 /**
@@ -14,6 +14,7 @@ import { createCustomEvent, defaultPreventedPreservedOnDispatch } from './polyfi
  * ------------------------------------------------------------------------
  */
 
+const $ = getjQuery()
 const namespaceRegex = /[^.]*(?=\..*)\.|.*/
 const stripNameRegex = /\..*/
 const keyEventRegex = /^key/
@@ -80,7 +81,7 @@ const nativeEvents = [
  */
 
 function getUidEvent(element, uid) {
-  return uid && `${uid}::${uidEvent++}` || element.uidEvent || uidEvent++
+  return (uid && `${uid}::${uidEvent++}`) || element.uidEvent || uidEvent++
 }
 
 function getEvent(element) {
@@ -136,11 +137,13 @@ function bootstrapDelegationHandler(element, selector, fn) {
 }
 
 function findHandler(events, handler, delegationSelector = null) {
-  for (const uid of Object.keys(events)) {
-    const event = events[uid]
+  const uidEventList = Object.keys(events)
+
+  for (let i = 0, len = uidEventList.length; i < len; i++) {
+    const event = events[uidEventList[i]]
 
     if (event.originalHandler === handler && event.delegationSelector === delegationSelector) {
-      return events[uid]
+      return event
     }
   }
 
@@ -190,7 +193,9 @@ function addHandler(element, originalTypeEvent, handler, delegationFn, oneOff) {
   }
 
   const uid = getUidEvent(originalHandler, originalTypeEvent.replace(namespaceRegex, ''))
-  const fn = delegation ? bootstrapDelegationHandler(element, handler, delegationFn) : bootstrapHandler(element, handler)
+  const fn = delegation ?
+    bootstrapDelegationHandler(element, handler, delegationFn) :
+    bootstrapHandler(element, handler)
 
   fn.delegationSelector = delegation ? handler : null
   fn.originalHandler = originalHandler
@@ -204,7 +209,7 @@ function addHandler(element, originalTypeEvent, handler, delegationFn, oneOff) {
 function removeHandler(element, events, typeEvent, handler, delegationSelector) {
   const fn = findHandler(events[typeEvent], handler, delegationSelector)
 
-  if (fn === null) {
+  if (!fn) {
     return
   }
 
@@ -257,7 +262,7 @@ const EventHandler = {
     if (isNamespace) {
       Object.keys(events)
         .forEach(elementEvent => {
-          removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.substr(1))
+          removeNamespacedHandlers(element, events, elementEvent, originalTypeEvent.slice(1))
         })
     }
 
@@ -289,7 +294,7 @@ const EventHandler = {
     let defaultPrevented = false
     let evt = null
 
-    if (inNamespace && typeof $ !== 'undefined') {
+    if (inNamespace && $) {
       jQueryEvent = $.Event(event, args)
 
       $(element).trigger(jQueryEvent)

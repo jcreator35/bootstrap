@@ -305,14 +305,12 @@ Add dropdown menus with a little extra HTML and the [dropdowns JavaScript plugin
 
 Use the tab JavaScript plugin—include it individually or through the compiled `bootstrap.js` file—to extend our navigational tabs and pills to create tabbable panes of local content, even via dropdown menus.
 
-If you're building our JavaScript from source, it [requires `util.js`]({{< docsref "/getting-started/javascript#util" >}}).
-
 Dynamic tabbed interfaces, as described in the [<abbr title="Web Accessibility Initiative">WAI</abbr> <abbr title="Accessible Rich Internet Applications">ARIA</abbr> Authoring Practices](https://www.w3.org/TR/wai-aria-practices/#tabpanel), require `role="tablist"`, `role="tab"`, `role="tabpanel"`, and additional `aria-` attributes in order to convey their structure, functionality and current state to users of assistive technologies (such as screen readers).
 
 Note that dynamic tabbed interfaces should <em>not</em> contain dropdown menus, as this causes both usability and accessibility issues. From a usability perspective, the fact that the currently displayed tab's trigger element is not immediately visible (as it's inside the closed dropdown menu) can cause confusion. From an accessibility point of view, there is currently no sensible way to map this sort of construct to a standard WAI ARIA pattern, meaning that it cannot be easily made understandable to users of assistive technologies.
 
-<div class="bd-example bd-example-tabs">
-  <ul class="nav nav-tabs" id="myTab" role="tablist">
+<div class="bd-example">
+  <ul class="nav nav-tabs mb-3" id="myTab" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Home</a>
     </li>
@@ -357,9 +355,9 @@ Note that dynamic tabbed interfaces should <em>not</em> contain dropdown menus, 
 
 To help fit your needs, this works with `<ul>`-based markup, as shown above, or with any arbitrary "roll your own" markup. Note that if you're using `<nav>`, you shouldn't add `role="tablist"` directly to it, as this would override the element's native role as a navigation landmark. Instead, switch to an alternative element (in the example below, a simple `<div>`) and wrap the `<nav>` around it.
 
-<div class="bd-example bd-example-tabs">
+<div class="bd-example">
   <nav>
-    <div class="nav nav-tabs" id="nav-tab" role="tablist">
+    <div class="nav nav-tabs mb-3" id="nav-tab" role="tablist">
       <a class="nav-item nav-link active" id="nav-home-tab" data-toggle="tab" href="#nav-home" role="tab" aria-controls="nav-home" aria-selected="true">Home</a>
       <a class="nav-item nav-link" id="nav-profile-tab" data-toggle="tab" href="#nav-profile" role="tab" aria-controls="nav-profile" aria-selected="false">Profile</a>
       <a class="nav-item nav-link" id="nav-contact-tab" data-toggle="tab" href="#nav-contact" role="tab" aria-controls="nav-contact" aria-selected="false">Contact</a>
@@ -395,7 +393,7 @@ To help fit your needs, this works with `<ul>`-based markup, as shown above, or 
 
 The tabs plugin also works with pills.
 
-<div class="bd-example bd-example-tabs">
+<div class="bd-example">
   <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
     <li class="nav-item">
       <a class="nav-link active" id="pills-home-tab" data-toggle="pill" href="#pills-home" role="tab" aria-controls="pills-home" aria-selected="true">Home</a>
@@ -441,7 +439,7 @@ The tabs plugin also works with pills.
 
 And with vertical pills.
 
-<div class="bd-example bd-example-tabs">
+<div class="bd-example">
   <div class="row">
     <div class="col-3">
       <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
@@ -526,19 +524,25 @@ You can activate a tab or pill navigation without writing any JavaScript by simp
 Enable tabbable tabs via JavaScript (each tab needs to be activated individually):
 
 {{< highlight js >}}
-$('#myTab a').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
+var triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'))
+triggerTabList.forEach(function (triggerEl) {
+  var tabTrigger = new bootstrap.Tab(triggerEl)
+
+  triggerEl.addEventListener('click', function (e) {
+    e.preventDefault()
+    tabTrigger.show()
+  })
 })
 {{< /highlight >}}
 
 You can activate individual tabs in several ways:
 
 {{< highlight js >}}
-$('#myTab a[href="#profile"]').tab('show') // Select tab by name
-$('#myTab li:first-child a').tab('show') // Select first tab
-$('#myTab li:last-child a').tab('show') // Select last tab
-$('#myTab li:nth-child(3) a').tab('show') // Select third tab
+var triggerEl = document.querySelector('#myTab a[href="#profile"]')
+bootstrap.Tab.getInstance(triggerEl).show() // Select tab by name
+
+var triggerFirstTabEl = document.querySelector('#myTab li:first-child a')
+bootstrap.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
 {{< /highlight >}}
 
 ### Fade effect
@@ -560,7 +564,7 @@ To make tabs fade in, add `.fade` to each `.tab-pane`. The first tab pane must a
 {{< partial "callout-danger-async-methods.md" >}}
 {{< /callout >}}
 
-#### $().tab
+#### constructor
 
 Activates a tab element and content container. Tab should have either a `data-target` or an `href` targeting a container node in the DOM.
 
@@ -588,23 +592,36 @@ Activates a tab element and content container. Tab should have either a `data-ta
 </div>
 
 <script>
-  $(function () {
-    $('#myTab li:last-child a').tab('show')
-  })
+  var firstTabEl = document.querySelector('#myTab li:last-child a')
+  var firstTab = new bootstrap.Tab(firstTabEl)
+
+  firstTab.show()
 </script>
 {{< /highlight >}}
 
-#### .tab('show')
+#### show
 
 Selects the given tab and shows its associated pane. Any other tab that was previously selected becomes unselected and its associated pane is hidden. **Returns to the caller before the tab pane has actually been shown** (i.e. before the `shown.bs.tab` event occurs).
 
 {{< highlight js >}}
-$('#someTab').tab('show')
+  var someTabTriggerEl = document.querySelector('#someTabTrigger')
+  var tab = new bootstrap.Tab(someTabTriggerEl)
+
+  tab.show()
 {{< /highlight >}}
 
-#### .tab('dispose')
+#### dispose
 
 Destroys an element's tab.
+
+#### getInstance
+
+*Static* method which allows you to get the tab instance associated with a DOM element
+
+{{< highlight js >}}
+var triggerEl = document.querySelector('#trigger')
+var tab = bootstrap.Tab.getInstance(triggerEl) // Returns a Bootstrap tab instance
+{{< /highlight >}}
 
 ### Events
 
@@ -617,10 +634,10 @@ When showing a new tab, the events fire in the following order:
 
 If no tab was already active, then the `hide.bs.tab` and `hidden.bs.tab` events will not be fired.
 
-<table class="table table-bordered table-striped">
+<table class="table">
   <thead>
     <tr>
-      <th style="width: 150px;">Event Type</th>
+      <th style="width: 150px;">Event type</th>
       <th>Description</th>
     </tr>
   </thead>
@@ -645,7 +662,8 @@ If no tab was already active, then the `hide.bs.tab` and `hidden.bs.tab` events 
 </table>
 
 {{< highlight js >}}
-$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+var tabEl = document.querySelector('a[data-toggle="tab"]')
+tabEl.addEventListener('shown.bs.tab', function (e) {
   e.target // newly activated tab
   e.relatedTarget // previous active tab
 })

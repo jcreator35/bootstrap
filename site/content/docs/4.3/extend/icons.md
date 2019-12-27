@@ -5,26 +5,36 @@ description: Guidance and suggestions for using external icon libraries with Boo
 group: extend
 ---
 
-Bootstrap doesn't include an icon library by default, but we have a handful of recommendations for you to choose from. While most icon sets include multiple file formats, we prefer SVG implementations for their improved accessibility and vector support.
+While Bootstrap doesn't include an icon set by default, we do have our own comprehensive icon library called Bootstrap Icons. Feel free to use them or any other icon set in your project. We've included details for Bootstrap Icons and other preferred icon sets below.
 
-## Preferred
+While most icon sets include multiple file formats, we prefer SVG implementations for their improved accessibility and vector support.
 
-We've tested and used these icon sets ourselves.
+## Bootstrap Icons
 
-- [Font Awesome](https://fontawesome.com/)
-- [Iconic](https://github.com/iconic/open-iconic)
-- [Octicons](https://octicons.github.com/)
+Bootstrap Icons is a growing library of SVG icons that are designed by [@mdo](https://github.com/mdo) and maintained by [the Bootstrap Team](https://github.com/orgs/twbs/people). The beginnings of this icon set come from Bootstrap's very own components—our forms, carousels, and more. Bootstrap has very few icon needs out of the box, so we didn't need much. However, once we got going, we couldn't stop making more.
+
+Oh, and did we mention they're completely open source? Licensed under MIT, just like Bootstrap, our icon set is available to everyone.
+
+[Learn more about Bootstrap Icons](https://icons.getbootstrap.com/), including how to install them and recommended usage.
+
+## Alternatives
+
+We've tested and used these icon sets ourselves as preferred alternatives to Bootstrap Icons.
+
+{{< markdown >}}
+{{< icons.inline >}}
+{{- $type := .Get "type" | default "preferred" -}}
+
+{{- range (index .Site.Data.icons $type) }}
+- [{{ .name }}]({{ .website }})
+{{- end }}
+{{< /icons.inline >}}
+{{< /markdown >}}
 
 ## More options
 
-While we haven't tried these out, they do look promising and provide multiple formats—including SVG.
+While we haven't tried these out ourselves, they do look promising and provide multiple formats, including SVG.
 
-- [Bytesize](https://github.com/danklammer/bytesize-icons)
-- [Google Material icons](https://material.io/tools/icons/)
-- [Ionicons](https://ionicons.com/)
-- [Feather](https://feathericons.com/)
-- [Dripicons](http://demo.amitjakhu.com/dripicons/)
-- [Ikons](http://ikons.piotrkwiatkowski.co.uk/)
-- [Glyph](https://glyph.smarticons.co/)
-- [Icons8](https://icons8.com/)
-- [icofont](https://icofont.com/)
+{{< markdown >}}
+{{< icons.inline type="more" />}}
+{{< /markdown >}}

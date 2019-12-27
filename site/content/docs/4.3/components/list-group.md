@@ -152,15 +152,15 @@ Add badges to any list group item to show unread counts, activity, and more with
 <ul class="list-group">
   <li class="list-group-item d-flex justify-content-between align-items-center">
     Cras justo odio
-    <span class="badge badge-primary badge-pill">14</span>
+    <span class="badge bg-primary rounded-pill">14</span>
   </li>
   <li class="list-group-item d-flex justify-content-between align-items-center">
     Dapibus ac facilisis in
-    <span class="badge badge-primary badge-pill">2</span>
+    <span class="badge bg-primary rounded-pill">2</span>
   </li>
   <li class="list-group-item d-flex justify-content-between align-items-center">
     Morbi leo risus
-    <span class="badge badge-primary badge-pill">1</span>
+    <span class="badge bg-primary rounded-pill">1</span>
   </li>
 </ul>
 {{< /example >}}
@@ -197,6 +197,63 @@ Add nearly any HTML within, even for linked list groups like the one below, with
   </a>
 </div>
 {{< /example >}}
+
+## Checkboxes and radios
+
+Place Bootstrap's checkboxes and radios within list group items and customize as needed. You can use them without `<label>`s, but please remember to include an `aria-label` attribute and value for accessibility.
+
+{{< example >}}
+<ul class="list-group">
+  <li class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="" aria-label="...">
+    Cras justo odio
+  </li>
+  <li class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="" aria-label="...">
+    Dapibus ac facilisis in
+  </li>
+  <li class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="" aria-label="...">
+    Morbi leo risus
+  </li>
+  <li class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="" aria-label="...">
+    Porta ac consectetur ac
+  </li>
+  <li class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="" aria-label="...">
+    Vestibulum at eros
+  </li>
+</ul>
+{{< /example >}}
+
+And if you want `<label>`s as the `.list-group-item` for large hit areas, you can do that, too.
+
+{{< example >}}
+<div class="list-group">
+  <label class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="">
+    Cras justo odio
+  </label>
+  <label class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="">
+    Dapibus ac facilisis in
+  </label>
+  <label class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="">
+    Morbi leo risus
+  </label>
+  <label class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="">
+    Porta ac consectetur ac
+  </label>
+  <label class="list-group-item">
+    <input class="form-check-input mr-1" type="checkbox" value="">
+    Vestibulum at eros
+  </label>
+</div>
+{{< /example >}}
+
 
 ## JavaScript behavior
 
@@ -281,19 +338,25 @@ You can activate a list group navigation without writing any JavaScript by simpl
 Enable tabbable list item via JavaScript (each list item needs to be activated individually):
 
 {{< highlight js >}}
-$('#myList a').on('click', function (e) {
-  e.preventDefault()
-  $(this).tab('show')
+var triggerTabList = [].slice.call(document.querySelectorAll('#myTab a'))
+triggerTabList.forEach(function (triggerEl) {
+  var tabTrigger = new bootstrap.Tab(triggerEl)
+
+  triggerEl.addEventListener('click', function (e) {
+    e.preventDefault()
+    tabTrigger.show()
+  })
 })
 {{< /highlight >}}
 
 You can activate individual list item in several ways:
 
 {{< highlight js >}}
-$('#myList a[href="#profile"]').tab('show') // Select tab by name
-$('#myList a:first-child').tab('show') // Select first tab
-$('#myList a:last-child').tab('show') // Select last tab
-$('#myList a:nth-child(3)').tab('show') // Select third tab
+var triggerEl = document.querySelector('#myTab a[href="#profile"]')
+bootstrap.Tab.getInstance(triggerEl).show() // Select tab by name
+
+var triggerFirstTabEl = document.querySelector('#myTab li:first-child a')
+bootstrap.Tab.getInstance(triggerFirstTabEl).show() // Select first tab
 {{< /highlight >}}
 
 ### Fade effect
@@ -311,7 +374,7 @@ To make tabs panel fade in, add `.fade` to each `.tab-pane`. The first tab pane 
 
 ### Methods
 
-#### $().tab
+#### constructor
 
 Activates a list item element and content container. Tab should have either a `data-target` or an `href` targeting a container node in the DOM.
 
@@ -331,18 +394,35 @@ Activates a list item element and content container. Tab should have either a `d
 </div>
 
 <script>
-  $(function () {
-    $('#myList a:last-child').tab('show')
-  })
+  var firstTabEl = document.querySelector('#myTab a:last-child')
+  var firstTab = new bootstrap.Tab(firstTabEl)
+
+  firstTab.show()
 </script>
 {{< /highlight >}}
 
-#### .tab('show')
+#### show
 
 Selects the given list item and shows its associated pane. Any other list item that was previously selected becomes unselected and its associated pane is hidden. **Returns to the caller before the tab pane has actually been shown** (for example, before the `shown.bs.tab` event occurs).
 
 {{< highlight js >}}
-$('#someListItem').tab('show')
+  var someListItemEl = document.querySelector('#someListItem')
+  var tab = new bootstrap.Tab(someListItemEl)
+
+  tab.show()
+{{< /highlight >}}
+
+#### dispose
+
+Destroys an element's tab.
+
+#### getInstance
+
+*Static* method which allows you to get the tab instance associated with a DOM element
+
+{{< highlight js >}}
+var triggerEl = document.querySelector('#trigger')
+var tab = bootstrap.Tab.getInstance(triggerEl) // Returns a Bootstrap tab instance
 {{< /highlight >}}
 
 ### Events
@@ -356,7 +436,7 @@ When showing a new tab, the events fire in the following order:
 
 If no tab was already active, the `hide.bs.tab` and `hidden.bs.tab` events will not be fired.
 
-<table class="table table-bordered table-striped">
+<table class="table">
   <thead>
     <tr>
       <th style="width: 150px;">Event type</th>
@@ -384,7 +464,8 @@ If no tab was already active, the `hide.bs.tab` and `hidden.bs.tab` events will 
 </table>
 
 {{< highlight js >}}
-$('a[data-toggle="list"]').on('shown.bs.tab', function (e) {
+var tabEl = document.querySelector('a[data-toggle="list"]')
+tabEl.addEventListener('shown.bs.tab', function (e) {
   e.target // newly activated tab
   e.relatedTarget // previous active tab
 })

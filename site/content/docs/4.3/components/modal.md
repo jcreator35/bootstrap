@@ -18,8 +18,11 @@ Before getting started with Bootstrap's modal component, be sure to read the fol
 - Due to how HTML5 defines its semantics, [the `autofocus` HTML attribute](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input#attr-autofocus) has no effect in Bootstrap modals. To achieve the same effect, use some custom JavaScript:
 
 {{< highlight js >}}
-$('#myModal').on('shown.bs.modal', function () {
-  $('#myInput').trigger('focus')
+var myModal = document.getElementById('myModal')
+var myInput = document.getElementById('myInput')
+
+myModal.addEventListener('shown.bs.modal', function () {
+  myInput.focus()
 })
 {{< /highlight >}}
 
@@ -136,6 +139,65 @@ Toggle a working modal demo by clicking the button below. It will slide down and
   </div>
 </div>
 {{< /highlight >}}
+
+### Static backdrop
+
+When backdrop is set to static, the modal will not close when clicking outside it. Click the button below to try it.
+
+<div id="staticBackdropLive" class="modal fade" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLiveLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLiveLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>I will not close if you click outside me. Don't even try to press escape key.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="bd-example">
+  <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdropLive">
+    Launch static backdrop modal
+  </button>
+</div>
+
+{{< highlight html >}}
+<!-- Button trigger modal -->
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
+  Launch static backdrop modal
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        ...
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Understood</button>
+      </div>
+    </div>
+  </div>
+</div>
+{{< /highlight >}}
+
 
 ### Scrolling long content
 
@@ -520,11 +582,11 @@ Below is a live demo followed by example HTML and JavaScript. For more informati
       </div>
       <div class="modal-body">
         <form>
-          <div class="form-group">
+          <div class="mb-3">
             <label for="recipient-name" class="col-form-label">Recipient:</label>
             <input type="text" class="form-control" id="recipient-name">
           </div>
-          <div class="form-group">
+          <div class="mb-3">
             <label for="message-text" class="col-form-label">Message:</label>
             <textarea class="form-control" id="message-text"></textarea>
           </div>
@@ -540,15 +602,18 @@ Below is a live demo followed by example HTML and JavaScript. For more informati
 {{< /example >}}
 
 {{< highlight js >}}
-$('#exampleModal').on('show.bs.modal', function (event) {
-  var button = $(event.relatedTarget) // Button that triggered the modal
-  var recipient = button.data('whatever') // Extract info from data-* attributes
+var exampleModal = document.getElementById('exampleModal')
+exampleModal.addEventListener('show.bs.modal', function (event) {
+  // Button that triggered the modal
+  var button = event.relatedTarget
+  // Extract info from data-* attributes
+  var recipient = button.getAttribute('data-whatever')
   // If necessary, you could initiate an AJAX request here
   // and then do the updating in a callback.
+  //
   // Update the modal's content.
-  var modal = $(this)
-  modal.find('.modal-title').text('New message to ' + recipient)
-  modal.find('.modal-body input').val(recipient)
+  exampleModal.querySelector('.modal-title').textContent = 'New message to ' + recipient
+  exampleModal.querySelector('.modal-body input').value = recipient
 })
 {{< /highlight >}}
 
@@ -570,7 +635,7 @@ For modals that simply appear rather than fade in to view, remove the `.fade` cl
 
 ### Dynamic heights
 
-If the height of a modal changes while it is open, you should call `$('#myModal').modal('handleUpdate')` to readjust the modal's position in case a scrollbar appears.
+If the height of a modal changes while it is open, you should call `myModal.handleUpdate()` to readjust the modal's position in case a scrollbar appears.
 
 ### Accessibility
 
@@ -584,7 +649,7 @@ Embedding YouTube videos in modals requires additional JavaScript not in Bootstr
 
 Modals have three optional sizes, available via modifier classes to be placed on a `.modal-dialog`. These sizes kick in at certain breakpoints to avoid horizontal scrollbars on narrower viewports.
 
-<table class="table table-bordered table-striped">
+<table class="table">
   <thead>
     <tr>
       <th>Size</th>
@@ -629,7 +694,7 @@ Our default modal without modifier class constitutes the "medium" size modal.
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-xl">Extra large modal</button>
 
 <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
       ...
     </div>
@@ -640,7 +705,7 @@ Our default modal without modifier class constitutes the "medium" size modal.
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-lg">Large modal</button>
 
 <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       ...
     </div>
@@ -651,7 +716,7 @@ Our default modal without modifier class constitutes the "medium" size modal.
 <button type="button" class="btn btn-primary" data-toggle="modal" data-target=".bd-example-modal-sm">Small modal</button>
 
 <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       ...
     </div>
@@ -660,9 +725,8 @@ Our default modal without modifier class constitutes the "medium" size modal.
 {{< /highlight >}}
 
 <div class="modal fade bd-example-modal-xl" tabindex="-1" role="dialog" aria-labelledby="myExtraLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-xl">
+  <div class="modal-dialog modal-xl" role="document">
     <div class="modal-content">
-
       <div class="modal-header">
         <h5 class="modal-title h4" id="myExtraLargeModalLabel">Extra large modal</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -677,9 +741,8 @@ Our default modal without modifier class constitutes the "medium" size modal.
 </div>
 
 <div class="modal fade bd-example-modal-lg" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
+  <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-
       <div class="modal-header">
         <h5 class="modal-title h4" id="myLargeModalLabel">Large modal</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -694,7 +757,7 @@ Our default modal without modifier class constitutes the "medium" size modal.
 </div>
 
 <div class="modal fade bd-example-modal-sm" tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-sm">
+  <div class="modal-dialog modal-sm" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title h4" id="mySmallModalLabel">Small modal</h5>
@@ -723,15 +786,17 @@ Activate a modal without writing JavaScript. Set `data-toggle="modal"` on a cont
 
 ### Via JavaScript
 
-Call a modal with id `myModal` with a single line of JavaScript:
+Create a modal with a single line of JavaScript:
 
-{{< highlight js >}}$('#myModal').modal(options){{< /highlight >}}
+{{< highlight js >}}
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), options)
+{{< /highlight >}}
 
 ### Options
 
 Options can be passed via data attributes or JavaScript. For data attributes, append the option name to `data-`, as in `data-backdrop=""`.
 
-<table class="table table-bordered table-striped">
+<table class="table">
   <thead>
     <tr>
       <th style="width: 100px;">Name</th>
@@ -745,7 +810,7 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
       <td>backdrop</td>
       <td>boolean or the string <code>'static'</code></td>
       <td>true</td>
-      <td>Includes a modal-backdrop element. Alternatively, specify <code>static</code> for a backdrop which doesn't close the modal on click.</td>
+      <td>Includes a modal-backdrop element. Alternatively, specify <code>static</code> for a backdrop which doesn't close the modal on click or on escape key press.</td>
     </tr>
     <tr>
       <td>keyboard</td>
@@ -774,52 +839,63 @@ Options can be passed via data attributes or JavaScript. For data attributes, ap
 {{< partial "callout-danger-async-methods.md" >}}
 {{< /callout >}}
 
-#### `.modal(options)`
+#### Passing options
 
 Activates your content as a modal. Accepts an optional options `object`.
 
 {{< highlight js >}}
-$('#myModal').modal({
+var myModal = new bootstrap.Modal(document.getElementById('myModal'), {
   keyboard: false
 })
 {{< /highlight >}}
 
-#### `.modal('toggle')`
+#### toggle
 
 Manually toggles a modal. **Returns to the caller before the modal has actually been shown or hidden** (i.e. before the `shown.bs.modal` or `hidden.bs.modal` event occurs).
 
-{{< highlight js >}}$('#myModal').modal('toggle'){{< /highlight >}}
+{{< highlight js >}}myModal.toggle(){{< /highlight >}}
 
-#### `.modal('show')`
+#### show
 
 Manually opens a modal. **Returns to the caller before the modal has actually been shown** (i.e. before the `shown.bs.modal` event occurs).
 
-{{< highlight js >}}$('#myModal').modal('show'){{< /highlight >}}
+{{< highlight js >}}myModal.show(){{< /highlight >}}
 
-#### `.modal('hide')`
+#### hide
 
 Manually hides a modal. **Returns to the caller before the modal has actually been hidden** (i.e. before the `hidden.bs.modal` event occurs).
 
-{{< highlight js >}}$('#myModal').modal('hide'){{< /highlight >}}
+{{< highlight js >}}myModal.hide(){{< /highlight >}}
 
-#### `.modal('handleUpdate')`
+#### handleUpdate
 
 Manually readjust the modal's position if the height of a modal changes while it is open (i.e. in case a scrollbar appears).
 
-{{< highlight js >}}$('#myModal').modal('handleUpdate'){{< /highlight >}}
+{{< highlight js >}}myModal.handleUpdate(){{< /highlight >}}
 
-#### `.modal('dispose')`
+#### dispose
 
 Destroys an element's modal.
+
+{{< highlight js >}}myModal.dispose(){{< /highlight >}}
+
+#### getInstance
+
+*Static* method which allows you to get the modal instance associated with a DOM element
+
+{{< highlight js >}}
+var myModalEl = document.getElementById('myModal')
+var modal = bootstrap.Modal.getInstance(myModalEl) // Returns a Bootstrap modal instance
+{{< /highlight >}}
 
 ### Events
 
 Bootstrap's modal class exposes a few events for hooking into modal functionality. All modal events are fired at the modal itself (i.e. at the `<div class="modal">`).
 
-<table class="table table-bordered table-striped">
+<table class="table">
   <thead>
     <tr>
-      <th style="width: 150px;">Event Type</th>
+      <th style="width: 150px;">Event type</th>
       <th>Description</th>
     </tr>
   </thead>
@@ -840,11 +916,16 @@ Bootstrap's modal class exposes a few events for hooking into modal functionalit
       <td>hidden.bs.modal</td>
       <td>This event is fired when the modal has finished being hidden from the user (will wait for CSS transitions to complete).</td>
     </tr>
+    <tr>
+      <td>hidePrevented.bs.modal</td>
+      <td>This event is fired when the modal is shown, its backdrop is <code>static</code> and a click outside the modal or an escape key press is performed.</td>
+    </tr>
   </tbody>
 </table>
 
 {{< highlight js >}}
-$('#myModal').on('hidden.bs.modal', function (e) {
+var myModalEl = document.getElementById('myModal')
+myModalEl.addEventListener('hidden.bs.modal', function (e) {
   // do something...
 })
 {{< /highlight >}}

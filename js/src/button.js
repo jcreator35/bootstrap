@@ -5,7 +5,7 @@
  * --------------------------------------------------------------------------
  */
 
-import { jQuery as $ } from './util/index'
+import { getjQuery } from './util/index'
 import Data from './dom/data'
 import EventHandler from './dom/event-handler'
 import SelectorEngine from './dom/selector-engine'
@@ -74,17 +74,15 @@ class Button {
     if (rootElement) {
       const input = SelectorEngine.findOne(Selector.INPUT, this._element)
 
-      if (input) {
-        if (input.type === 'radio') {
-          if (input.checked &&
-            this._element.classList.contains(ClassName.ACTIVE)) {
-            triggerChangeEvent = false
-          } else {
-            const activeElement = SelectorEngine.findOne(Selector.ACTIVE, rootElement)
+      if (input && input.type === 'radio') {
+        if (input.checked &&
+          this._element.classList.contains(ClassName.ACTIVE)) {
+          triggerChangeEvent = false
+        } else {
+          const activeElement = SelectorEngine.findOne(Selector.ACTIVE, rootElement)
 
-            if (activeElement) {
-              activeElement.classList.remove(ClassName.ACTIVE)
-            }
+          if (activeElement) {
+            activeElement.classList.remove(ClassName.ACTIVE)
           }
         }
 
@@ -122,7 +120,7 @@ class Button {
 
   // Static
 
-  static _jQueryInterface(config) {
+  static jQueryInterface(config) {
     return this.each(function () {
       let data = Data.getData(this, DATA_KEY)
 
@@ -136,7 +134,7 @@ class Button {
     })
   }
 
-  static _getInstance(element) {
+  static getInstance(element) {
     return Data.getData(element, DATA_KEY)
   }
 }
@@ -158,7 +156,6 @@ EventHandler.on(document, Event.CLICK_DATA_API, Selector.DATA_TOGGLE_CARROT, eve
   let data = Data.getData(button, DATA_KEY)
   if (!data) {
     data = new Button(button)
-    Data.setData(button, DATA_KEY, data)
   }
 
   data.toggle()
@@ -180,21 +177,23 @@ EventHandler.on(document, Event.BLUR_DATA_API, Selector.DATA_TOGGLE_CARROT, even
   }
 })
 
+const $ = getjQuery()
+
 /**
  * ------------------------------------------------------------------------
  * jQuery
  * ------------------------------------------------------------------------
  * add .button to jQuery only if jQuery is present
  */
-
-if (typeof $ !== 'undefined') {
+/* istanbul ignore if */
+if ($) {
   const JQUERY_NO_CONFLICT = $.fn[NAME]
-  $.fn[NAME] = Button._jQueryInterface
+  $.fn[NAME] = Button.jQueryInterface
   $.fn[NAME].Constructor = Button
 
   $.fn[NAME].noConflict = () => {
     $.fn[NAME] = JQUERY_NO_CONFLICT
-    return Button._jQueryInterface
+    return Button.jQueryInterface
   }
 }
 

@@ -12,7 +12,6 @@ const rollup = require('rollup')
 const babel = require('rollup-plugin-babel')
 const banner = require('./banner.js')
 
-const TEST = process.env.NODE_ENV === 'test'
 const plugins = [
   babel({
     // Only transpile our source code
@@ -23,7 +22,7 @@ const plugins = [
       'createClass',
       'inheritsLoose',
       'defineProperty',
-      'objectSpread'
+      'objectSpread2'
     ]
   })
 ]
@@ -31,6 +30,7 @@ const bsPlugins = {
   Data: path.resolve(__dirname, '../js/src/dom/data.js'),
   EventHandler: path.resolve(__dirname, '../js/src/dom/event-handler.js'),
   Manipulator: path.resolve(__dirname, '../js/src/dom/manipulator.js'),
+  Polyfill: path.resolve(__dirname, '../js/src/dom/polyfill.js'),
   SelectorEngine: path.resolve(__dirname, '../js/src/dom/selector-engine.js'),
   Alert: path.resolve(__dirname, '../js/src/alert.js'),
   Button: path.resolve(__dirname, '../js/src/button.js'),
@@ -44,12 +44,7 @@ const bsPlugins = {
   Toast: path.resolve(__dirname, '../js/src/toast.js'),
   Tooltip: path.resolve(__dirname, '../js/src/tooltip.js')
 }
-const rootPath = TEST ? '../js/coverage/dist/' : '../js/dist/'
-
-if (TEST) {
-  bsPlugins.Util = path.resolve(__dirname, '../js/src/util/index.js')
-  bsPlugins.Sanitizer = path.resolve(__dirname, '../js/src/util/sanitizer.js')
-}
+const rootPath = path.resolve(__dirname, '../js/dist/')
 
 const defaultPluginConfig = {
   external: [
@@ -69,13 +64,16 @@ function getConfigByPluginKey(pluginKey) {
     pluginKey === 'Data' ||
     pluginKey === 'Manipulator' ||
     pluginKey === 'EventHandler' ||
+    pluginKey === 'Polyfill' ||
     pluginKey === 'SelectorEngine' ||
     pluginKey === 'Util' ||
     pluginKey === 'Sanitizer'
   ) {
     return {
-      external: [],
-      globals: {}
+      external: [bsPlugins.Polyfill],
+      globals: {
+        [bsPlugins.Polyfill]: 'Polyfill'
+      }
     }
   }
 
@@ -144,6 +142,7 @@ const domObjects = [
   'Data',
   'EventHandler',
   'Manipulator',
+  'Polyfill',
   'SelectorEngine'
 ]
 
@@ -173,7 +172,7 @@ function build(plugin) {
       name: plugin,
       sourcemap: true,
       globals,
-      file: path.resolve(__dirname, `${pluginPath}${pluginFilename}`)
+      file: path.resolve(__dirname, `${pluginPath}/${pluginFilename}`)
     })
       .then(() => console.log(`Building ${plugin} plugin... Done!`))
       .catch(error => console.error(`${plugin}: ${error}`))

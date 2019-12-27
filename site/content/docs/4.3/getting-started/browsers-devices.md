@@ -15,7 +15,9 @@ Alternative browsers which use the latest version of WebKit, Blink, or Gecko, wh
 You can find our supported range of browsers and their versions [in our `.browserslistrc file`]({{< param repo >}}/blob/v{{< param current_version >}}/.browserslistrc):
 
 ```text
-{{< rf.inline >}}{{ readFile ".browserslistrc" | htmlEscape }}{{< /rf.inline >}}
+{{< rf.inline >}}
+{{- readFile ".browserslistrc" | htmlEscape -}}
+{{< /rf.inline >}}
 ```
 
 We use [Autoprefixer](https://github.com/postcss/autoprefixer) to handle intended browser support via CSS prefixes, which uses [Browserslist](https://github.com/browserslist/browserslist) to manage these browser versions. Consult their documentation for how to integrate these tools into your projects.
@@ -24,10 +26,10 @@ We use [Autoprefixer](https://github.com/postcss/autoprefixer) to handle intende
 
 Generally speaking, Bootstrap supports the latest versions of each major platform's default browsers. Note that proxy browsers (such as Opera Mini, Opera Mobile's Turbo mode, UC Browser Mini, Amazon Silk) are not supported.
 
-<table class="table table-bordered table-striped">
+<table class="table">
   <thead>
     <tr>
-      <td></td>
+      <th></th>
       <th>Chrome</th>
       <th>Firefox</th>
       <th>Safari</th>
@@ -38,27 +40,27 @@ Generally speaking, Bootstrap supports the latest versions of each major platfor
   <tbody>
     <tr>
       <th scope="row">Android</th>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported</td>
-      <td class="text-muted">N/A</td>
-      <td class="text-success">Android v5.0+ supported</td>
-      <td class="text-success">Supported</td>
+      <td>Supported</td>
+      <td>Supported</td>
+      <td class="text-muted">&mdash;</td>
+      <td>v6.0+</td>
+      <td>Supported</td>
     </tr>
     <tr>
       <th scope="row">iOS</th>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported</td>
-      <td class="text-muted">N/A</td>
-      <td class="text-success">Supported</td>
+      <td>Supported</td>
+      <td>Supported</td>
+      <td>Supported</td>
+      <td class="text-muted">&mdash;</td>
+      <td>Supported</td>
     </tr>
     <tr>
-      <th scope="row">Windows 10 Mobile</th>
-      <td class="text-muted">N/A</td>
-      <td class="text-muted">N/A</td>
-      <td class="text-muted">N/A</td>
-      <td class="text-muted">N/A</td>
-      <td class="text-success">Supported</td>
+      <th scope="row" class="text-nowrap">Windows 10 Mobile</th>
+      <td class="text-muted">&mdash;</td>
+      <td class="text-muted">&mdash;</td>
+      <td class="text-muted">&mdash;</td>
+      <td class="text-muted">&mdash;</td>
+      <td>Supported</td>
     </tr>
   </tbody>
 </table>
@@ -67,10 +69,10 @@ Generally speaking, Bootstrap supports the latest versions of each major platfor
 
 Similarly, the latest versions of most desktop browsers are supported.
 
-<table class="table table-bordered table-striped">
+<table class="table">
   <thead>
     <tr>
-      <td></td>
+      <th></th>
       <th>Chrome</th>
       <th>Firefox</th>
       <th>Internet Explorer</th>
@@ -82,21 +84,21 @@ Similarly, the latest versions of most desktop browsers are supported.
   <tbody>
     <tr>
       <th scope="row">Mac</th>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported</td>
-      <td class="text-muted">N/A</td>
-      <td class="text-muted">N/A</td>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported</td>
+      <td>Supported</td>
+      <td>Supported</td>
+      <td class="text-muted">&mdash;</td>
+      <td class="text-muted">&mdash;</td>
+      <td>Supported</td>
+      <td>Supported</td>
     </tr>
     <tr>
       <th scope="row">Windows</th>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported, IE11</td>
-      <td class="text-success">Supported</td>
-      <td class="text-success">Supported</td>
-      <td class="text-danger">Not supported</td>
+      <td>Supported</td>
+      <td>Supported</td>
+      <td>IE11 only</td>
+      <td>Supported</td>
+      <td>Supported</td>
+      <td class="text-muted">&mdash;</td>
     </tr>
   </tbody>
 </table>
@@ -104,8 +106,6 @@ Similarly, the latest versions of most desktop browsers are supported.
 For Firefox, in addition to the latest normal stable release, we also support the latest [Extended Support Release (ESR)](https://www.mozilla.org/en-US/firefox/organizations/#faq) version of Firefox.
 
 Unofficially, Bootstrap should look and behave well enough in Chromium and Chrome for Linux, Firefox for Linux, and Internet Explorer 9, though they are not officially supported.
-
-For a list of some of the browser bugs that Bootstrap has to grapple with, see our [Wall of browser bugs]({{< docsref "/browser-bugs" >}}).
 
 ## Internet Explorer
 
@@ -123,33 +123,11 @@ As of iOS 9.2, while a modal is open, if the initial touch of a scroll gesture i
 
 ### Navbar Dropdowns
 
-The `.dropdown-backdrop` element isn't used on iOS in the nav because of the complexity of z-indexing. Thus, to close dropdowns in navbars, you must directly click the dropdown element (or [any other element which will fire a click event in iOS](https://developer.mozilla.org/en-US/docs/Web/Events/click#Safari_Mobile)).
+The `.dropdown-backdrop` element isn't used on iOS in the nav because of the complexity of z-indexing. Thus, to close dropdowns in navbars, you must directly click the dropdown element (or [any other element which will fire a click event in iOS](https://developer.mozilla.org/en-US/docs/Web/API/Element/click_event#Safari_Mobile)).
 
 ## Browser zooming
 
 Page zooming inevitably presents rendering artifacts in some components, both in Bootstrap and the rest of the web. Depending on the issue, we may be able to fix it (search first and then open an issue if need be). However, we tend to ignore these as they often have no direct solution other than hacky workarounds.
-
-## Android stock browser
-
-Out of the box, Android 4.1 (and even some newer releases apparently) ship with the Browser app as the default web browser of choice (as opposed to Chrome). Unfortunately, the Browser app has lots of bugs and inconsistencies with CSS in general.
-
-#### Select menu
-
-On `<select>` elements, the Android stock browser will not display the side controls if there is a `border-radius` and/or `border` applied. (See [this StackOverflow question](https://stackoverflow.com/questions/14744437/html-select-box-not-showing-drop-down-arrow-on-android-version-4-0-when-set-with) for details.) Use the snippet of code below to remove the offending CSS and render the `<select>` as an unstyled element on the Android stock browser. The user agent sniffing avoids interference with Chrome, Safari, and Mozilla browsers.
-
-{{< highlight html >}}
-<script>
-$(function () {
-  var nua = navigator.userAgent
-  var isAndroid = (nua.indexOf('Mozilla/5.0') > -1 && nua.indexOf('Android ') > -1 && nua.indexOf('AppleWebKit') > -1 && nua.indexOf('Chrome') === -1)
-  if (isAndroid) {
-    $('select.form-control').removeClass('form-control').css('width', '100%')
-  }
-})
-</script>
-{{< /highlight >}}
-
-Want to see an example? [Check out this JS Bin demo](http://jsbin.com/OyaqoDO/2).
 
 ## Validators
 
