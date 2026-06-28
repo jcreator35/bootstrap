@@ -1,24 +1,22 @@
-/*!
- * Bootstrap v4.3.1 (https://getbootstrap.com/)
- * Copyright 2011-2019 The Bootstrap Authors
- * Copyright 2011-2019 Twitter, Inc.
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
- */
+@import "mixins/banner";
+@include bsBanner("");
 
+
+// scss-docs-start import-stack
 // Configuration
-
 @import "functions";
 @import "variables";
+@import "variables-dark";
+@import "maps";
 @import "mixins";
 @import "utilities";
 
-
 // Layout & components
-
 @import "root";
 @import "reboot";
 @import "type";
 @import "images";
+@import "containers";
 @import "grid";
 @import "tables";
 @import "forms";
@@ -29,6 +27,7 @@
 @import "nav";
 @import "navbar";
 @import "card";
+@import "accordion";
 @import "breadcrumb";
 @import "pagination";
 @import "badge";
@@ -42,13 +41,12 @@
 @import "popover";
 @import "carousel";
 @import "spinners";
-
+@import "offcanvas";
+@import "placeholders";
 
 // Helpers
-
 @import "helpers";
 
-
 // Utilities
-
 @import "utilities/api";
+// scss-docs-end import-stack

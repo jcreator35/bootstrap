@@ -1,8 +1,8 @@
-## How does Bootstrap's test suite work?
+## How does Bootstrap’s test suite work?
 
 Bootstrap uses [Jasmine](https://jasmine.github.io/). Each plugin has a file dedicated to its tests in `tests/unit/<plugin-name>.spec.js`.
 
-* `visual/` contains "visual" tests which are run interactively in real browsers and require manual verification by humans.
+- `visual/` contains "visual" tests which are run interactively in real browsers and require manual verification by humans.
 
 To run the unit test suite via [Karma](https://karma-runner.github.io/), run `npm run js-test`.
 To run the unit test suite via [Karma](https://karma-runner.github.io/) and debug, run `npm run js-debug`.
@@ -18,15 +18,15 @@ To run the unit test suite via [Karma](https://karma-runner.github.io/) and debu
 
 ## What should a unit test look like?
 
-* Each test should have a unique name clearly stating what unit is being tested.
-* Each test should be in the corresponding `describe`.
-* Each test should test only one unit per test, although one test can include several assertions. Create multiple tests for multiple units of functionality.
-* Each test should use [`expect`](https://jasmine.github.io/api/edge/matchers.html) to ensure something is expected.
-* Each test should follow the project's [JavaScript Code Guidelines](https://github.com/twbs/bootstrap/blob/master/CONTRIBUTING.md#js)
+- Each test should have a unique name clearly stating what unit is being tested.
+- Each test should be in the corresponding `describe`.
+- Each test should test only one unit per test, although one test can include several assertions. Create multiple tests for multiple units of functionality.
+- Each test should use [`expect`](https://jasmine.github.io/api/edge/matchers.html) to ensure something is expected.
+- Each test should follow the project’s [JavaScript Code Guidelines](https://github.com/twbs/bootstrap/blob/main/.github/CONTRIBUTING.md#js)
 
 ## Code coverage
 
-Currently we're aiming for at least 90% test coverage for our code. To ensure your changes meet or exceed this limit, run `npm run js-test-karma` and open the file in `js/coverage/lcov-report/index.html` to see the code coverage for each plugin. See more details when you select a plugin and ensure your change is fully covered by unit tests.
+Currently we’re aiming for at least 90% test coverage for our code. To ensure your changes meet or exceed this limit, run `npm run js-test-karma` and open the file in `js/coverage/lcov-report/index.html` to see the code coverage for each plugin. See more details when you select a plugin and ensure your change is fully covered by unit tests.
 
 ### Example tests
 
@@ -35,7 +35,7 @@ Currently we're aiming for at least 90% test coverage for our code. To ensure yo
 describe('getInstance', () => {
   it('should return null if there is no instance', () => {
     // Make assertion
-    expect(Tab.getInstance(fixtureEl)).toEqual(null)
+    expect(Tab.getInstance(fixtureEl)).toBeNull()
   })
 
   it('should return this instance', () => {
@@ -50,22 +50,24 @@ describe('getInstance', () => {
 })
 
 // Asynchronous test
-it('should show a tooltip without the animation', done => {
-  fixtureEl.innerHTML = '<a href="#" rel="tooltip" title="Another tooltip"/>'
+it('should show a tooltip without the animation', () => {
+  return new Promise(resolve => {
+    fixtureEl.innerHTML = '<a href="#" rel="tooltip" title="Another tooltip"></a>'
 
-  const tooltipEl = fixtureEl.querySelector('a')
-  const tooltip = new Tooltip(tooltipEl, {
-    animation: false
+    const tooltipEl = fixtureEl.querySelector('a')
+    const tooltip = new Tooltip(tooltipEl, {
+      animation: false
+    })
+
+    tooltipEl.addEventListener('shown.bs.tooltip', () => {
+      const tip = document.querySelector('.tooltip')
+
+      expect(tip).not.toBeNull()
+      expect(tip.classList.contains('fade')).toEqual(false)
+      resolve()
+    })
+
+    tooltip.show()
   })
-
-  tooltipEl.addEventListener('shown.bs.tooltip', () => {
-    const tip = document.querySelector('.tooltip')
-
-    expect(tip).toBeDefined()
-    expect(tip.classList.contains('fade')).toEqual(false)
-    done()
-  })
-
-  tooltip.show()
 })
 ```

@@ -16,17 +16,21 @@
   z-index: $zindex-fixed;
 }
 
-// Responsive sticky top
-@supports (position: sticky) {
-  @each $breakpoint in map-keys($grid-breakpoints) {
-    @include media-breakpoint-up($breakpoint) {
-      $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+// Responsive sticky top and bottom
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
 
-      .sticky#{$infix}-top {
-        position: sticky;
-        top: 0;
-        z-index: $zindex-sticky;
-      }
+    .sticky#{$infix}-top {
+      position: sticky;
+      top: 0;
+      z-index: $zindex-sticky;
+    }
+
+    .sticky#{$infix}-bottom {
+      position: sticky;
+      bottom: 0;
+      z-index: $zindex-sticky;
     }
   }
 }

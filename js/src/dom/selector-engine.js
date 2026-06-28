@@ -1,74 +1,125 @@
 /**
  * --------------------------------------------------------------------------
- * Bootstrap (v4.3.1): dom/selector-engine.js
- * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * Bootstrap dom/selector-engine.js
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  * --------------------------------------------------------------------------
  */
 
-import { find as findFn, findOne, matches, closest } from './polyfill'
-import { makeArray } from '../util/index'
+import { isDisabled, isVisible, parseSelector } from '../util/index.js'
 
-/**
- * ------------------------------------------------------------------------
- * Constants
- * ------------------------------------------------------------------------
- */
+const getSelector = element => {
+  let selector = element.getAttribute('data-bs-target')
 
-const NODE_TEXT = 3
+  if (!selector || selector === '#') {
+    let hrefAttribute = element.getAttribute('href')
+
+    // The only valid content that could double as a selector are IDs or classes,
+    // so everything starting with `#` or `.`. If a "real" URL is used as the selector,
+    // `document.querySelector` will rightfully complain it is invalid.
+    // See https://github.com/twbs/bootstrap/issues/32273
+    if (!hrefAttribute || (!hrefAttribute.includes('#') && !hrefAttribute.startsWith('.'))) {
+      return null
+    }
+
+    // Just in case some CMS puts out a full URL with the anchor appended
+    if (hrefAttribute.includes('#') && !hrefAttribute.startsWith('#')) {
+      hrefAttribute = `#${hrefAttribute.split('#')[1]}`
+    }
+
+    selector = hrefAttribute && hrefAttribute !== '#' ? hrefAttribute.trim() : null
+  }
+
+  return selector ? selector.split(',').map(sel => parseSelector(sel)).join(',') : null
+}
 
 const SelectorEngine = {
-  matches(element, selector) {
-    return matches.call(element, selector)
-  },
-
   find(selector, element = document.documentElement) {
-    return findFn.call(element, selector)
+    return [].concat(...Element.prototype.querySelectorAll.call(element, selector))
   },
 
   findOne(selector, element = document.documentElement) {
-    return findOne.call(element, selector)
+    return Element.prototype.querySelector.call(element, selector)
   },
 
   children(element, selector) {
-    const children = makeArray(element.children)
-
-    return children.filter(child => this.matches(child, selector))
+    return [].concat(...element.children).filter(child => child.matches(selector))
   },
 
   parents(element, selector) {
     const parents = []
+    let ancestor = element.parentNode.closest(selector)
 
-    let ancestor = element.parentNode
-
-    while (ancestor && ancestor.nodeType === Node.ELEMENT_NODE && ancestor.nodeType !== NODE_TEXT) {
-      if (this.matches(ancestor, selector)) {
-        parents.push(ancestor)
-      }
-
-      ancestor = ancestor.parentNode
+    while (ancestor) {
+      parents.push(ancestor)
+      ancestor = ancestor.parentNode.closest(selector)
     }
 
     return parents
   },
 
-  closest(element, selector) {
-    return closest.call(element, selector)
-  },
-
   prev(element, selector) {
-    const siblings = []
+    let previous = element.previousElementSibling
 
-    let previous = element.previousSibling
-
-    while (previous && previous.nodeType === Node.ELEMENT_NODE && previous.nodeType !== NODE_TEXT) {
-      if (this.matches(previous, selector)) {
-        siblings.push(previous)
+    while (previous) {
+      if (previous.matches(selector)) {
+        return [previous]
       }
 
-      previous = previous.previousSibling
+      previous = previous.previousElementSibling
     }
 
-    return siblings
+    return []
+  },
+  // TODO: this is now unused; remove later along with prev()
+  next(element, selector) {
+    let next = element.nextElementSibling
+
+    while (next) {
+      if (next.matches(selector)) {
+        return [next]
+      }
+
+      next = next.nextElementSibling
+    }
+
+    return []
+  },
+
+  focusableChildren(element) {
+    const focusables = [
+      'a',
+      'button',
+      'input',
+      'textarea',
+      'select',
+      'details',
+      '[tabindex]',
+      '[contenteditable="true"]'
+    ].map(selector => `${selector}:not([tabindex^="-"])`).join(',')
+
+    return this.find(focusables, element).filter(el => !isDisabled(el) && isVisible(el))
+  },
+
+  getSelectorFromElement(element) {
+    const selector = getSelector(element)
+
+    if (selector) {
+      return SelectorEngine.findOne(selector) ? selector : null
+    }
+
+    return null
+  },
+
+  getElementFromSelector(element) {
+    const selector = getSelector(element)
+
+    return selector ? SelectorEngine.findOne(selector) : null
+  },
+
+  getMultipleElementsFromSelector(element) {
+    const selector = getSelector(element)
+
+    return selector ? SelectorEngine.find(selector) : []
   }
 }
 
